@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function startConversation() {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        await addMessage("I heard from Sir. Oza you are birthday hmm?");
+        await addMessage("I heard from Sir. Oza that today is your birthday hmm?");
         showOptions(chatOptions);
     }
 
