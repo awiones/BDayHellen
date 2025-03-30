@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with Cat 🐱</title>
+    <title>Katze 🐱</title>
     <style>
         .chat-container {
             max-width: 600px;
@@ -120,6 +120,8 @@
             justify-content: center;
             flex-wrap: wrap;
             animation: fadeIn 0.3s ease;
+            max-height: 40vh;
+            overflow-y: auto;
         }
 
         .option-btn {
@@ -130,6 +132,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 1rem;
+            max-width: 100%;
+            word-wrap: break-word;
         }
 
         .option-btn:hover {
@@ -235,15 +239,17 @@
             }
 
             .chat-options {
-                padding: 0.5rem;
+                padding: 0.8rem;
+                max-height: 30vh;
+                -webkit-overflow-scrolling: touch;
             }
 
             .option-btn {
-                padding: 8px 15px;
-                font-size: 0.9rem;
-                white-space: normal;
-                text-align: center;
-                min-width: 120px;
+                padding: 12px 20px;
+                font-size: 1rem;
+                width: 100%;
+                margin: 5px 0;
+                min-width: unset;
             }
 
             .chat-image {
@@ -294,7 +300,7 @@
     <div class="chat-container">
         <div class="chat-header">
             <div class="cat-icon">😺</div>
-            <h1>Chat with Birthday Cat</h1>
+            <h1>Katze </h1>
         </div>
         <div class="chat-messages" id="chatMessages">
             <div class="typing-indicator">
