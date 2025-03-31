@@ -78,22 +78,44 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollToBottom();
     }
 
-    // Add scroll when showing options
+    // Add this function to handle button disable/enable
+    function setButtonState(button, disabled = true) {
+        button.disabled = disabled;
+        if (disabled) {
+            button.style.opacity = '0.5';
+            button.style.cursor = 'default';
+        }
+    }
+
+    // Add this function to ensure all options are hidden
+    function hideAllOptions() {
+        document.querySelectorAll('.chat-options').forEach(container => {
+            container.style.display = 'none';
+        });
+    }
+
+    // Update showOptions to first hide all other options
     function showOptions(optionsDiv) {
-        optionsDiv.style.display = 'flex';
-        setTimeout(() => {
-            scrollToBottom();
-        }, 100); // Small delay to ensure options are rendered
+        hideAllOptions();
+        if (optionsDiv) {
+            optionsDiv.style.display = 'flex';
+            // Enable all buttons in the new options container
+            optionsDiv.querySelectorAll('.option-btn').forEach(btn => {
+                setButtonState(btn, false);
+            });
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100); // Small delay to ensure options are rendered
+        }
     }
 
     async function startConversation() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         await addMessage("I heard from Sir. Oza that today is your birthday hmm?");
-        showOptions(chatOptions);
+        showOptions(initialResponse);
     }
 
     async function handleSongResponse(response) {
-        const songResponses = document.getElementById('songResponses');
         songResponses.style.display = 'none';
 
         if (response === 'omg') {
@@ -105,23 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show next question
             await addMessage("I heard you gonna go as an... animal doctor? 🤔");
             
-            // Show new response option
-            const vetResponse = document.createElement('div');
-            vetResponse.className = 'chat-options';
-            vetResponse.innerHTML = `
-                <button class="option-btn" data-response="vet">You mean a veterinarian? 🐾</button>
-            `;
-            messagesContainer.appendChild(vetResponse);
+            // Show vet response options
             showOptions(vetResponse);
             
-            // Add listener for new response
-            vetResponse.querySelector('.option-btn').addEventListener('click', async function() {
-                this.disabled = true;
-                vetResponse.style.display = 'none';
-                await addMessage("You mean a veterinarian? 🐾", true);
-                await handleVetResponse();
-            });
-
         } else if (response === 'where') {
             await addMessage("Where did that music come from? 🤔", true);
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -131,51 +139,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show next question
             await addMessage("I heard you gonna go as an... animal doctor? 🤔");
             
-            // Show new response option
-            const vetResponse = document.createElement('div');
-            vetResponse.className = 'chat-options';
-            vetResponse.innerHTML = `
-                <button class="option-btn" data-response="vet">You mean a veterinarian? 🐾</button>
-            `;
-            messagesContainer.appendChild(vetResponse);
+            // Show vet response options
             showOptions(vetResponse);
-            
-            // Add listener for new response
-            vetResponse.querySelector('.option-btn').addEventListener('click', async function() {
-                this.disabled = true;
-                vetResponse.style.display = 'none';
-                await addMessage("You mean a veterinarian? 🐾", true);
-                await handleVetResponse();
-            });
         }
     }
 
+    // Update handleVetResponse to prevent duplicate execution
     async function handleVetResponse() {
+        vetResponse.style.display = 'none';
+        await addMessage("You mean a veterinarian? 🐾", true);
         await addMessage("YES THAT! 😸", false);
         await new Promise(resolve => setTimeout(resolve, 1000));
         await addMessage("i'm a cat and actually kinda sick... want to see my face? 😿", false);
-
-        // Show concern options
-        const concernOptions = document.createElement('div');
-        concernOptions.className = 'chat-options';
-        concernOptions.innerHTML = `
-            <button class="option-btn" data-response="picture">Sure? can you even take picture? 📸</button>
-            <button class="option-btn" data-response="concern">What happened to you? 😟</button>
-        `;
-        messagesContainer.appendChild(concernOptions);
         showOptions(concernOptions);
-
-        // Add listeners for concern responses
-        concernOptions.querySelectorAll('.option-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                this.disabled = true;
-                concernOptions.style.display = 'none';
-                await handleConcernResponse(this.dataset.response);
-            });
-        });
     }
 
     async function handleConcernResponse(response) {
+        // Hide concern options immediately
+        hideAllOptions();
+        
         if (response === 'picture') {
             await addMessage("Sure? can you even take picture? 📸", true);
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -200,83 +182,41 @@ document.addEventListener('DOMContentLoaded', () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
         await addMessage("I have autism... 💕", false);
 
-        // Add empathy response option
-        const empathyOptions = document.createElement('div');
-        empathyOptions.className = 'chat-options';
-        empathyOptions.innerHTML = `
-            <button class="option-btn" data-response="empathy">I'm so sorry to hear that... 🥺</button>
-        `;
-        messagesContainer.appendChild(empathyOptions);
+        // Show empathy options
         showOptions(empathyOptions);
-
-        // Add listener for empathy response
-        empathyOptions.querySelector('.option-btn').addEventListener('click', async function() {
-            this.disabled = true;
-            empathyOptions.style.display = 'none';
-            await handleEmpathyResponse();
-        });
     }
 
     async function handleEmpathyResponse() {
+        // Hide empathy options immediately
+        hideAllOptions();
+        
         await addMessage("I'm so sorry to hear that... 🥺", true);
         await new Promise(resolve => setTimeout(resolve, 1500));
         await addMessage("Thank you for caring... 💝", false);
         await new Promise(resolve => setTimeout(resolve, 1500));
         await addMessage("Can you promise me something? 🥺", false);
         
-        // Add promise response option
-        const promiseOptions = document.createElement('div');
-        promiseOptions.className = 'chat-options';
-        promiseOptions.innerHTML = `
-            <button class="option-btn" data-response="what">What is it? 💭</button>
-        `;
-        messagesContainer.appendChild(promiseOptions);
+        // Show promise options
         showOptions(promiseOptions);
-
-        // Add listener for promise response
-        promiseOptions.querySelector('.option-btn').addEventListener('click', async function() {
-            this.disabled = true;
-            promiseOptions.style.display = 'none';
-            await addMessage("What is it? 💭", true);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            await addMessage("Promise me you'll become a veterinarian... 🐱", false);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await addMessage("So cats like me can be healthy and happy again! 💖", false);
-
-            // After the cat asks about the promise
-            const promiseChoices = document.createElement('div');
-            promiseChoices.className = 'chat-options';
-            promiseChoices.innerHTML = `
-                <button class="option-btn" data-response="yes-promise">Yes, I promise! 🤝</button>
-                <button class="option-btn" data-response="not-sure">I'm not sure... 😕</button>
-            `;
-            messagesContainer.appendChild(promiseChoices);
-            showOptions(promiseChoices);
-
-            // Add listeners for promise choices
-            promiseChoices.querySelectorAll('.option-btn').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    this.disabled = true;
-                    promiseChoices.style.display = 'none';
-                    await handlePromiseResponse(this.dataset.response);
-                });
-            });
-        });
     }
 
     async function handlePromiseResponse(response) {
+        // Hide all options immediately
+        hideAllOptions();
+        
         if (response === 'yes-promise') {
             await addMessage("Yes, I promise! 🤝", true);
             await new Promise(resolve => setTimeout(resolve, 1500));
             await addMessage("I'm happy! Then tell Sir. Oza you gonna be one! 😸", false);
             await new Promise(resolve => setTimeout(resolve, 2000));
             
-            // Create offline message with animation
+            // Create offline message with animation without showing new options
             const offlineMsg = document.createElement('div');
             offlineMsg.className = 'system-message';
             offlineMsg.textContent = '🔴 The cat has gone offline';
             offlineMsg.style.animation = 'fadeIn 0.5s ease';
             messagesContainer.appendChild(offlineMsg);
+            scrollToBottom();
             
         } else if (response === 'not-sure') {
             await addMessage("I'm not sure... 😕", true);
@@ -285,28 +225,15 @@ document.addEventListener('DOMContentLoaded', () => {
             await new Promise(resolve => setTimeout(resolve, 1000));
             await addMessage("Is it because you're scared? Or is there something else holding you back? 🤔", false);
             
-            // Add reason options
-            const reasonOptions = document.createElement('div');
-            reasonOptions.className = 'chat-options';
-            reasonOptions.innerHTML = `
-                <button class="option-btn" data-response="scared">Yes, I'm a bit scared...</button>
-                <button class="option-btn" data-response="different">I might want to do something different</button>
-            `;
-            messagesContainer.appendChild(reasonOptions);
+            // Show reason options
             showOptions(reasonOptions);
-
-            // Add listeners for reason responses
-            reasonOptions.querySelectorAll('.option-btn').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    this.disabled = true;
-                    reasonOptions.style.display = 'none';
-                    await handleUncertaintyResponse(this.dataset.response);
-                });
-            });
         }
     }
 
     async function handleUncertaintyResponse(response) {
+        // Hide the reason options immediately
+        reasonOptions.style.display = 'none';
+        
         if (response === 'scared') {
             await addMessage("Yes, I'm a bit scared...", true);
             await new Promise(resolve => setTimeout(resolve, 1500));
@@ -328,46 +255,122 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Common ending for both paths
         await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Hide all option containers one final time
+        hideAllOptions();
+        
         const offlineMsg = document.createElement('div');
         offlineMsg.className = 'system-message';
         offlineMsg.textContent = '🔴 The cat has gone offline';
         offlineMsg.style.animation = 'fadeIn 0.5s ease';
         messagesContainer.appendChild(offlineMsg);
+        scrollToBottom();
     }
 
+    // Get references to all option containers
+    const initialResponse = document.getElementById('initialResponse');
+    const songResponses = document.getElementById('songResponses');
+    const vetResponse = document.getElementById('vetResponse');
+    const concernOptions = document.getElementById('concernOptions');
+    const empathyOptions = document.getElementById('empathyOptions');
+    const promiseOptions = document.getElementById('promiseOptions');
+    const promiseChoices = document.getElementById('promiseChoices');
+    const reasonOptions = document.getElementById('reasonOptions');
+
+    // Hide all option containers initially except initialResponse
+    [songResponses, vetResponse, concernOptions, empathyOptions, 
+     promiseOptions, promiseChoices, reasonOptions].forEach(container => {
+        if (container) container.style.display = 'none';
+    });
+
     // Update the conversation flow
-    document.querySelector('.option-btn').addEventListener('click', async function() {
-        this.disabled = true;
-        chatOptions.style.display = 'none';
-        
-        await addMessage("Yes! Why?", true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await addMessage("Well... I have a surprise for you! 😺");
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        await addMessage("But first, let me sing you a birthday song! 🎵");
-        
-        // Start playing the song after a short delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+    initialResponse.querySelector('.option-btn').addEventListener('click', async function() {
         try {
-            await birthdaySong.play();
-            await addMessage("🎵 ~Meow meow meow~ 🎵");
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            await addMessage("🎂 Happy Birthday dear Hellen! 🎉");
+            if (this.disabled) return;
+            setButtonState(this, true);
+            hideAllOptions();
             
-            // Show response options
-            const songResponses = document.getElementById('songResponses');
-            showOptions(songResponses);
+            await addMessage("Yes! Why?", true);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await addMessage("Well... I have a surprise for you! 😺");
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            await addMessage("But first, let me sing you a birthday song! 🎵");
             
-            // Add click listeners to new options
-            songResponses.querySelectorAll('.option-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    handleSongResponse(this.dataset.response);
-                });
-            });
-        } catch (err) {
-            console.log('Audio playback failed:', err);
-            await addMessage("*The cat seems to have lost its voice* 😿");
+            // Start playing the song after a short delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            try {
+                await birthdaySong.play();
+                await addMessage("🎵 ~Meow meow meow~ 🎵");
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                await addMessage("🎂 Happy Birthday dear Hellen! 🎉");
+                
+                // Show song response options
+                showOptions(songResponses);
+                
+            } catch (err) {
+                console.log('Audio playback failed:', err);
+                await addMessage("*The cat seems to have lost its voice* 😿");
+            }
+        } catch (error) {
+            console.error('Error in initial response:', error);
+            await addMessage("Oops! Something went wrong... 😿", false);
         }
+    });
+
+    // Add event listeners for all option buttons
+    document.querySelectorAll('.chat-options .option-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            try {
+                // Prevent double clicks
+                if (this.disabled) return;
+                
+                // Disable the button immediately
+                setButtonState(this, true);
+                
+                const response = this.dataset.response;
+                const optionContainer = this.closest('.chat-options');
+                
+                // Disable all buttons in the container
+                optionContainer.querySelectorAll('.option-btn').forEach(btn => {
+                    setButtonState(btn, true);
+                });
+
+                switch(optionContainer.id) {
+                    case 'songResponses':
+                        await handleSongResponse(response);
+                        break;
+                    case 'vetResponse':
+                        await handleVetResponse();
+                        break;
+                    case 'concernOptions':
+                        await handleConcernResponse(response);
+                        break;
+                    case 'empathyOptions':
+                        await handleEmpathyResponse();
+                        break;
+                    case 'promiseOptions':
+                        // Hide options immediately
+                        hideAllOptions();
+                        await addMessage(this.textContent.trim(), true);
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await addMessage("Promise me you'll become a veterinarian... 🐱", false);
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await addMessage("So cats like me can be healthy and happy again! 💖", false);
+                        showOptions(promiseChoices);
+                        break;
+                    case 'promiseChoices':
+                        await handlePromiseResponse(response);
+                        break;
+                    case 'reasonOptions':
+                        await handleUncertaintyResponse(response);
+                        break;
+                }
+            } catch (error) {
+                console.error('Error handling button click:', error);
+                // Show a user-friendly error message if needed
+                await addMessage("Oops! Something went wrong... 😿", false);
+            }
+        });
     });
 
     // Start the conversation
